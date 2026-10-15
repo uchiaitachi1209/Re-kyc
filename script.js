@@ -11,7 +11,7 @@ const fields = [
     ['mobile','Mobile number (+91)','tel'],['sameMobile','Same as registered','checkbox'],['email','Email ID','email'],['house','House / flat'],['street','Street / locality'],['city','Village / city'],['district','District'],['state','State'],['pin','PIN code','text'],['addressType','Address type','select',['','Residential','Business','Correspondence','Permanent']],['permanentAddress','Permanent address (if different)','textarea']
   ]},
   {title:'3. Occupation & other information', items:[
-    ['occupation','Occupation','select',['','Salaried','Business','Agriculture','Professional','Retired','Student','Other']],['occupationOther','Other occupation'],['employer','Name of employer / business'],['income','Annual income (approx.)','select',['','Below ₹1 lakh','₹1–5 lakh','₹5–10 lakh','Above ₹10 lakh','Not stated']],['pep','Politically exposed person (PEP) status','select',['','No','Yes','Family member / close associate of PEP']],['taxOutside','Tax residency outside India?','select',['','No','Yes']]
+    ['occupation','Occupation','select',['','Salaried','Business','Agriculture','Professional','Retired','Student','Other']],['occupationOther','Other occupation'],['occupationCategory','Additional occupation category','select',['','P & SELF EMP / AGRI','PENSION','OTHER']],['employer','Name of employer / business'],['income','Annual income (approx.)','select',['','Below ₹1 lakh','₹1–5 lakh','₹5–10 lakh','Above ₹10 lakh','Not stated']],['pep','Politically exposed person (PEP) status','select',['','No','Yes','Family member / close associate of PEP']],['taxOutside','Tax residency outside India?','select',['','No','Yes']]
   ]},
   {title:'4. RE-KYC update request', items:[
     ['noChange','No change in existing KYC details','checkbox'],['changeAddress','Change / update address','checkbox'],['changeMobile','Mobile number','checkbox'],['changeEmail','Email ID','checkbox'],['changePan','PAN','checkbox'],['changeName','Name','checkbox'],['changeOccupation','Occupation / income','checkbox'],['changeOther','Other update','checkbox'],['changeOtherText','Other update details'],['updateRemarks','Details to be updated / remarks','textarea']
@@ -60,7 +60,7 @@ function renderEntry(){
       if(type==='select'){
         input=document.createElement('select'); for(const option of options){const el=document.createElement('option');el.value=option;el.textContent=option||'Select an option';input.append(el)}
       } else if(type==='textarea'){input=document.createElement('textarea');input.rows=2}
-      else {input=document.createElement('input');input.type=type; if(key==='pin') input.inputMode='numeric'; if(key==='mobile')input.inputMode='tel'}
+      else {input=document.createElement('input');input.type=type; if(key==='pin') input.inputMode='numeric'; if(key==='mobile')input.inputMode='tel'; if(key==='account')input.maxLength=17}
       input.id=key;input.name=key;input.autocomplete='off';
       if(type==='checkbox'){input.checked=Boolean(saved[key]);const text=document.createElement('label');text.htmlFor=key;text.textContent=label;wrap.append(input,text)}
       else {input.value=saved[key] ?? (key==='residenceCountry'?'India':'');const text=document.createElement('label');text.htmlFor=key;text.textContent=label;wrap.append(text,input)}
@@ -92,7 +92,7 @@ function renderPrint(){
   if(!document.querySelector('.sheet'))return;
   const data=storedData();
   for(const section of fields)for(const [key,,type] of section.items){if(type==='checkbox')putCheck(key,data[key]);else putText(key,type==='date'?readableDate(data[key]):data[key])}
-  for(const key of ['gender','addressType','occupation','income','pep','taxOutside','kycStatus','originals','verification']){
+  for(const key of ['gender','addressType','occupation','occupationCategory','income','pep','taxOutside','kycStatus','originals','verification']){
     document.querySelectorAll(`[data-choice="${key}"]`).forEach(el=>{el.textContent=data[key]===el.dataset.value?'☑':'☐'})
   }
   document.getElementById('print-button').addEventListener('click',()=>window.print());
